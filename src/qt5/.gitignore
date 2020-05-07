@@ -1,0 +1,12 @@
+.qmake.stash
+.xcode
+Makefile
+Makefile.Debug
+Makefile.Release
+debug
+moc_predefs.h
+qrc_icon.cpp
+release
+*.xcodeproj
+moc_*.cpp
+
