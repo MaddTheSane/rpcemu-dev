@@ -25,16 +25,16 @@
 
 #define UNUSED(x) (void)(x)
 
-const int MAX_KEYBOARD_LAYOUTS = 20;
+static const int MAX_KEYBOARD_LAYOUTS = 20;
 
-typedef enum
+typedef CF_ENUM(int, KeyboardLayoutType)
 {
     keyboardLayoutUndefined = 0,
     keyboardLayoutBritish = 1,
     keyboardLayoutFrench = 2
-} KeyboardLayoutType;
+};
 
-static int keyboardType;
+static KeyboardLayoutType keyboardType;
 
 typedef struct {
     uint32_t    virtual_key[MAX_KEYBOARD_LAYOUTS];      // Cocoa virtual keys
@@ -175,40 +175,39 @@ static const KeyMapInfo key_map[] = {
     { { 0xFFFF }, { 0, 0 } },
 };
 
-typedef enum
+typedef CF_ENUM(int, ModifierKeyCode)
 {
     modifierKeyStateShift = 0,
     modifierKeyStateControl = 1,
     modifierKeyStateAlt = 2,
     modifierKeyStateCapsLock = 3,
     modifierKeyStateCommand = 4
-} ModifierKeyCode;
+};
 
 typedef struct
 {
     int keyState[5];
 } ModifierState;
 
-ModifierState modifierState;
+static ModifierState modifierState;
+
+// The following are from the "NSEventModifierFlagOption" enumeration.
+typedef CF_OPTIONS(uint32_t, NativeModifierFlag) {
+	nativeModifierFlagShift = (1 << 17),
+	nativeModifierFlagControl = (1<< 18),
+	nativeModifierFlagOption = (1 << 19),
+	nativeModifierFlagCommand = (1 << 20)
+};
 
 typedef struct {
-    uint32_t modifierMask;
-    int checkMask;
+	NativeModifierFlag modifierMask;
+	ModifierKeyCode checkMask;
     uint maskLeft;
     uint maskRight;
     uint8_t set_2_left[8];
     uint8_t set_2_right[8];
     int simulateMenuButton;
 } ModifierMapInfo;
-
-// The following are from the "NSEventModifierFlagOption" enumeration.
-typedef enum
-{
-    nativeModifierFlagShift = (1 << 17),
-    nativeModifierFlagControl = (1<< 18),
-    nativeModifierFlagOption = (1 << 19),
-    nativeModifierFlagCommand = (1 << 20)
-} NativeModifierFlag;
 
 static const ModifierMapInfo modifier_map[] = {
     {nativeModifierFlagShift, modifierKeyStateShift, 0x102, 0x104, {0x12}, {0x59}, 0 },                      // Shift.
@@ -218,7 +217,7 @@ static const ModifierMapInfo modifier_map[] = {
     {0x1<<31, 0, 0, 0, {0}, {0}, 0 },
 };
 
-int get_virtual_key_index(size_t k)
+static int get_virtual_key_index(size_t k)
 {
     if (key_map[k].virtual_key[0] == 0) return 1;
     
